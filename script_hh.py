@@ -1,5 +1,4 @@
 import requests
-import json
 
 
 def salary_counter(salary_from, salary_to):
@@ -40,7 +39,9 @@ def predict_rub_salary(vacancies):
     return score_result
 
 
-def get_average_salary(area, professional_role, languages, pages_number):
+def get_statistic_salary(area, professional_role, pages_number):
+    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
+                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     avarage_result = {}
     all_vacancies = get_all_vacancies(
         languages, pages_number, area, professional_role)
@@ -59,9 +60,7 @@ def get_average_salary(area, professional_role, languages, pages_number):
 
 
 def main():
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    avarage_salarys = get_average_salary(113, 96, languages, 5)
+    avarage_salarys = get_statistic_salary(113, 96, 5)
     print(avarage_salarys)
 
 
