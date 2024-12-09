@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from script_hh import get_statistic_salary as hh_statistic
 from script_jf import get_statistic_salary as jf_statistic
-from terminaltables import AsciiTable, DoubleTable, SingleTable
+from terminaltables import AsciiTable
 
 
 def main():

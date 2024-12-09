@@ -23,7 +23,7 @@ def get_vacancies(language, token):
 
 
 def get_all_vacancies(languages):
-    token = environ['JOBFINDER_TOKEN']
+    token = environ['SUPERJOB_TOKEN']
     all_vacancies = {}
     for language in languages:
         response = get_vacancies(language, token)
