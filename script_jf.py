@@ -2,6 +2,9 @@ import requests
 from dotenv import load_dotenv
 from os import environ
 
+SUPERJOB_TOWN = 4
+SUPERJOB_CATALOGUES = 48
+
 
 def predict_rub_salary_for_superJob(vacancie):
     if vacancie['payment_from'] and vacancie['payment_to']:
@@ -15,10 +18,12 @@ def predict_rub_salary_for_superJob(vacancie):
 
 def get_vacancies(language, token):
     headers = {'X-Api-App-Id': token}
-    params = {'town': 4, 'catalogues': 48,
+    params = {'town': SUPERJOB_TOWN, 'catalogues': SUPERJOB_CATALOGUES,
               'keyword': '{}'.format(language), 'count': 100}
     response = requests.get(
-        'https://api.superjob.ru/2.0/vacancies/', headers=headers, params=params)
+        'https://api.superjob.ru/2.0/vacancies/',
+        headers=headers,
+        params=params)
     return response
 
 
@@ -35,7 +40,7 @@ def get_avarage_salary(vacancies):
     avarage_salary = []
     for vacancie in vacancies:
         avarage_salary.append(predict_rub_salary_for_superJob(vacancie))
-    nonempty_salary = [salary for salary in avarage_salary if salary != None]
+    nonempty_salary = [salary for salary in avarage_salary if salary]
     return nonempty_salary
 
 
@@ -46,13 +51,19 @@ def get_statistic_salary():
     all_vacancies = get_all_vacancies(languages)
     for language in languages:
         vacancies = all_vacancies[language]['objects']
-        salarys = get_avarage_salary(vacancies)
-        avarage_salary = int(sum(salarys)/len(salarys)
-                             ) if sum(salarys) > 0 else 0
-        count = len(salarys)
+        salaries = get_avarage_salary(vacancies)
+        if sum(salaries) > 0:
+            avarage_salary = int(sum(salaries)/len(salaries))
+        else:
+            avarage_salary = 0
+        # avarage_salary = int(sum(salaries)/len(salaries)
+        #                      ) if sum(salaries) > 0 else 0
+        count = len(salaries)
         amount = all_vacancies[language]['total']
         avarage_stattistic[language] = {
-            "vacancies_found": amount, "vacancies_processed": count, "average_salary": avarage_salary}
+            "vacancies_found": amount,
+            "vacancies_processed": count,
+            "average_salary": avarage_salary}
     return avarage_stattistic
 
 

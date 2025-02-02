@@ -9,16 +9,17 @@ def main():
 
     header = [[' Язык программирования ', 'Вакансий найдено',
               'Вакансий обработано', 'Средняя зарплата']]
+    hh_avarage_salary = hh_statistic().items()
+    superjob_avarage_salary = jf_statistic().items()
+    hh_salaries = header + [[key] + list(value.values())
+                            for key, value in hh_avarage_salary]
+    jf_salaries = header + [[key] + list(value.values())
+                            for key, value in superjob_avarage_salary]
 
-    hh_salarys = header + [[key] + list(value.values())
-                           for key, value in hh_statistic(113, 96, 5).items()]
-    jf_salarys = header + [[key] + list(value.values())
-                           for key, value in jf_statistic().items()]
-
-    table_hh = AsciiTable(hh_salarys, 'HeadHunter Moscow')
+    table_hh = AsciiTable(hh_salaries, 'HeadHunter Moscow')
     table_hh.justify_columns[2] = 'right'
 
-    table_jf = AsciiTable(jf_salarys, 'SuperJob Moscow')
+    table_jf = AsciiTable(jf_salaries, 'SuperJob Moscow')
     table_jf.justify_columns[2] = 'right'
 
     print(table_hh.table)
