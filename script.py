@@ -2,15 +2,16 @@ from dotenv import load_dotenv
 from script_hh import get_statistic_salary as hh_statistic
 from script_jf import get_statistic_salary as jf_statistic
 from terminaltables import AsciiTable
+from os import environ
 
 
 def main():
     load_dotenv()
-
+    token = environ['SUPERJOB_TOKEN']
     header = [[' Язык программирования ', 'Вакансий найдено',
               'Вакансий обработано', 'Средняя зарплата']]
     hh_avarage_salary = hh_statistic().items()
-    superjob_avarage_salary = jf_statistic().items()
+    superjob_avarage_salary = jf_statistic(token).items()
     hh_salaries = header + [[key] + list(value.values())
                             for key, value in hh_avarage_salary]
     jf_salaries = header + [[key] + list(value.values())

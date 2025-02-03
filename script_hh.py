@@ -1,13 +1,6 @@
 import requests
 import time
-
-
-def salary_counter(salary_from, salary_to):
-    if salary_from and salary_to:
-        return (salary_from + salary_to)/2
-    elif salary_from and not salary_to:
-        return salary_from * 1.2
-    return salary_to * 0.8
+from salary_counter import counte_salary
 
 
 def get_vacancies(area, professional_role, language, page=0):
@@ -34,53 +27,36 @@ def get_all_vacancies(languages, pages_number, area, professional_role):
         page_count = get_pagecount(language_vacancies)
         if page_count > 10:
             page_count = 10
-        page_count = 3
         while page < page_count:
             all_vacancies[language].append(get_vacancies(
                 area, professional_role, language, page))
-            # time.sleep(3)
+            time.sleep(2)
             page += 1
-            print('Язык {} {}/{}'.format(language, page, page_count))
     return all_vacancies
 
 
 def predict_rub_salary(vacancies):
-    score_result = []
+    predict_salary_result = []
     language_vacancies = vacancies['items']
     for json_item in language_vacancies:
         salary = json_item['salary']
         if salary:
-            salary = salary_counter(salary['from'], salary['to'])
-        score_result.append(salary)
-    return score_result
-
-
+            salary = counte_salary(salary['from'], salary['to'])
+        predict_salary_result.append(salary)
+    return predict_salary_result
 
 
 def get_statistic_salary(area=113, professional_role=96, pages_number=5):
     languages = ['JavaScript', 'Java', 'Python', 'Ruby',
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    avarage_result = {}
+    avarage_salary_result = {}
     all_vacancies = get_all_vacancies(
         languages,
         pages_number,
         area,
         professional_role
     )
-    # for vacancies in all_vacancies.items():
-    #     language_vacancies = vacancies[1]
-    #     language = vacancies[0]
-    #     nonempty_salaries = []
-    #     predict_rub_salary_new(vacancies)
-    #     for vacancy in language_vacancies:
-    #         salaries = [vacancy for salary in predict_rub_salary(
-    #             vacancies) if salary]
-    #         nonempty_salaries += salaries
-    #     nonempty_count = len(nonempty_salaries)
-    #     avarage_result[language] = {"vacancies_found": vacancy['found'],
-    #                                 "vacancies_processed": nonempty_count,
-    #                                 "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
-    for language,language_vacancies in all_vacancies.items():
+    for language, language_vacancies in all_vacancies.items():
         count = language_vacancies[0]['found']
         nonempty_salaries = []
         for vacancies in language_vacancies:
@@ -88,26 +64,14 @@ def get_statistic_salary(area=113, professional_role=96, pages_number=5):
                 vacancies) if salary]
             nonempty_salaries += salaries
         nonempty_count = len(nonempty_salaries)
-        avarage_result[language] = {"vacancies_found": count,
-                                    "vacancies_processed": nonempty_count,
-                                    "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
-        # print(language_lol)
-        
-
-    # for language in languages:
-    #     language_vacancies = all_vacancies[language]
-    #     count = language_vacancies[0]['found']
-    #     nonempty_salaries = []
-        
-    #     for vacancies in language_vacancies:
-    #         salaries = [salary for salary in predict_rub_salary(
-    #             vacancies) if salary]
-    #         nonempty_salaries += salaries
-    #     nonempty_count = len(nonempty_salaries)
-    #     avarage_result[language] = {"vacancies_found": count,
-    #                                 "vacancies_processed": nonempty_count,
-    #                                 "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
-    return avarage_result
+        average_salary = 0 if nonempty_count <= 0 else int(
+            sum(nonempty_salaries) /
+            len(nonempty_salaries)
+        )
+        avarage_salary_result[language] = {"vacancies_found": count,
+                                           "vacancies_processed": nonempty_count,
+                                           "average_salary": average_salary}
+    return avarage_salary_result
 
 
 def main():
