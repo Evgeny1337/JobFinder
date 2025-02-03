@@ -49,6 +49,8 @@ def get_statistic_salary():
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     avarage_stattistic = {}
     all_vacancies = get_all_vacancies(languages)
+    print('\n')
+    # Добить по аналогии с script_hh
     for language in languages:
         vacancies = all_vacancies[language]['objects']
         salaries = get_avarage_salary(vacancies)

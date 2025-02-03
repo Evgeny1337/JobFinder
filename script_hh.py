@@ -15,9 +15,9 @@ def get_vacancies(area, professional_role, language, page=0):
               'area': area,
               'professional_role': professional_role,
               'currency': 'RUR', 'page': page}
-    response = requests.get('https://api.hh.ru/vacancies', params=params)
-    json_response = response.json()
-    return json_response
+    json_response = requests.get('https://api.hh.ru/vacancies', params=params)
+    response = json_response.json()
+    return response
 
 
 def get_pagecount(json):
@@ -34,10 +34,11 @@ def get_all_vacancies(languages, pages_number, area, professional_role):
         page_count = get_pagecount(language_vacancies)
         if page_count > 10:
             page_count = 10
+        page_count = 3
         while page < page_count:
             all_vacancies[language].append(get_vacancies(
                 area, professional_role, language, page))
-            time.sleep(10)
+            # time.sleep(3)
             page += 1
             print('Язык {} {}/{}'.format(language, page, page_count))
     return all_vacancies
@@ -54,6 +55,8 @@ def predict_rub_salary(vacancies):
     return score_result
 
 
+
+
 def get_statistic_salary(area=113, professional_role=96, pages_number=5):
     languages = ['JavaScript', 'Java', 'Python', 'Ruby',
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
@@ -64,8 +67,20 @@ def get_statistic_salary(area=113, professional_role=96, pages_number=5):
         area,
         professional_role
     )
-    for language in languages:
-        language_vacancies = all_vacancies[language]
+    # for vacancies in all_vacancies.items():
+    #     language_vacancies = vacancies[1]
+    #     language = vacancies[0]
+    #     nonempty_salaries = []
+    #     predict_rub_salary_new(vacancies)
+    #     for vacancy in language_vacancies:
+    #         salaries = [vacancy for salary in predict_rub_salary(
+    #             vacancies) if salary]
+    #         nonempty_salaries += salaries
+    #     nonempty_count = len(nonempty_salaries)
+    #     avarage_result[language] = {"vacancies_found": vacancy['found'],
+    #                                 "vacancies_processed": nonempty_count,
+    #                                 "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
+    for language,language_vacancies in all_vacancies.items():
         count = language_vacancies[0]['found']
         nonempty_salaries = []
         for vacancies in language_vacancies:
@@ -76,6 +91,22 @@ def get_statistic_salary(area=113, professional_role=96, pages_number=5):
         avarage_result[language] = {"vacancies_found": count,
                                     "vacancies_processed": nonempty_count,
                                     "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
+        # print(language_lol)
+        
+
+    # for language in languages:
+    #     language_vacancies = all_vacancies[language]
+    #     count = language_vacancies[0]['found']
+    #     nonempty_salaries = []
+        
+    #     for vacancies in language_vacancies:
+    #         salaries = [salary for salary in predict_rub_salary(
+    #             vacancies) if salary]
+    #         nonempty_salaries += salaries
+    #     nonempty_count = len(nonempty_salaries)
+    #     avarage_result[language] = {"vacancies_found": count,
+    #                                 "vacancies_processed": nonempty_count,
+    #                                 "average_salary": int(sum(nonempty_salaries)/len(nonempty_salaries))}
     return avarage_result
 
 
