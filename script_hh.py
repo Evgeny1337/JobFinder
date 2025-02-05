@@ -46,7 +46,7 @@ def predict_rub_salary(vacancies):
     return predict_salary_result
 
 
-def get_statistic_salary(area=113, professional_role=96, pages_number=5):
+def get_hh_statistic_salary(area=113, professional_role=96, pages_number=5):
     languages = ['JavaScript', 'Java', 'Python', 'Ruby',
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     avarage_salary_result = {}
@@ -75,7 +75,7 @@ def get_statistic_salary(area=113, professional_role=96, pages_number=5):
 
 
 def main():
-    avarage_salarys = get_statistic_salary()
+    avarage_salarys = get_hh_statistic_salary()
     print(avarage_salarys)
 
 

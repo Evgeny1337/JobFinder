@@ -36,7 +36,7 @@ def get_avarage_salary(vacancies):
     return nonempty_salary
 
 
-def get_statistic_salary(token):
+def get_jf_statistic_salary(token):
     languages = ['JavaScript', 'Java', 'Python', 'Ruby',
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     avarage_stattistic = {}
@@ -60,7 +60,7 @@ def get_statistic_salary(token):
 def main():
     load_dotenv()
     token = environ['SUPERJOB_TOKEN']
-    print(get_statistic_salary(token))
+    print(get_jf_statistic_salary(token))
 
 
 if __name__ == '__main__':
