@@ -1,6 +1,6 @@
 import requests
 import time
-from salary_counter import counte_salary
+from salary_counter import get_average_salary
 from requests.adapters import HTTPAdapter,Retry
 
 
@@ -14,40 +14,45 @@ def get_vacancies(area, professional_role, language, page=0):
     return response
 
 
-def get_all_vacancies(languages, pages_number, area, professional_role):
+def get_all_vacancies(languages, area, professional_role):
     all_vacancies = {}
     for language in languages:
         page = 0
         all_vacancies[language] = []
         while True:
+            print(page)
             language_vacancies = get_vacancies(
                 area, professional_role, language, page)
+            try:
+                k = language_vacancies['pages']
+            except:
+                print(language_vacancies)
             all_vacancies[language].append(language_vacancies)
             if page >= language_vacancies['pages'] - 1:
                 break
             page+=1
+            print(f'{page}/{language_vacancies["pages"]}')
             time.sleep(4)
     return all_vacancies
 
 
-def predict_rub_salary(vacancies):
-    predict_salary_result = []
+def predict_rub_salaries(vacancies):
+    predict_salaries_result = []
     language_vacancies = vacancies['items']
-    for json_item in language_vacancies:
-        salary = json_item['salary']
+    for vacancy in language_vacancies:
+        salary = vacancy['salary']
         if salary:
-            salary = counte_salary(salary['from'], salary['to'])
-        predict_salary_result.append(salary)
-    return predict_salary_result
+            salary = get_average_salary(salary['from'], salary['to'])
+        predict_salaries_result.append(salary)
+    return predict_salaries_result
 
 
-def get_hh_statistic_salary(area=113, professional_role=96, pages_number=5):
+def get_hh_statistic_salary(area=113, professional_role=96):
     languages = ['JavaScript', 'Java', 'Python', 'Ruby',
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     avarage_salary_result = {}
     all_vacancies = get_all_vacancies(
         languages,
-        pages_number,
         area,
         professional_role
     )
@@ -55,7 +60,7 @@ def get_hh_statistic_salary(area=113, professional_role=96, pages_number=5):
         count = language_vacancies[0]['found']
         nonempty_salaries = []
         for vacancies in language_vacancies:
-            salaries = [salary for salary in predict_rub_salary(
+            salaries = [salary for salary in predict_rub_salaries(
                 vacancies) if salary]
             nonempty_salaries += salaries
         nonempty_count = len(nonempty_salaries)

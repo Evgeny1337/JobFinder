@@ -1,7 +1,7 @@
 import requests
 from dotenv import load_dotenv
 from os import environ
-from salary_counter import counte_salary
+from salary_counter import get_average_salary
 
 SUPERJOB_TOWN = 4
 SUPERJOB_CATALOGUES = 48
@@ -29,7 +29,7 @@ def get_all_vacancies(languages, token):
 def get_avarage_salary(vacancies):
     avarage_salaries = []
     for vacancie in vacancies:
-        avarage_salaries.append(counte_salary(
+        avarage_salaries.append(get_average_salary(
             vacancie['payment_from'],
             vacancie['payment_to']))
     nonempty_salary = [salary for salary in avarage_salaries if salary]
