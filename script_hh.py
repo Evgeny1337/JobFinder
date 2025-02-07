@@ -1,20 +1,17 @@
 import requests
 import time
 from salary_counter import counte_salary
+from requests.adapters import HTTPAdapter,Retry
 
 
 def get_vacancies(area, professional_role, language, page=0):
     params = {'text': 'Программист {}'.format(language),
               'area': area,
               'professional_role': professional_role,
-              'currency': 'RUR', 'page': page}
+              'currency': 'RUR', 'page': page, 'per_page': 100}
     json_response = requests.get('https://api.hh.ru/vacancies', params=params)
     response = json_response.json()
     return response
-
-
-def get_pagecount(json):
-    return json['pages']
 
 
 def get_all_vacancies(languages, pages_number, area, professional_role):
@@ -22,16 +19,14 @@ def get_all_vacancies(languages, pages_number, area, professional_role):
     for language in languages:
         page = 0
         all_vacancies[language] = []
-        language_vacancies = get_vacancies(
-            area, professional_role, language, page)
-        page_count = get_pagecount(language_vacancies)
-        if page_count > 10:
-            page_count = 10
-        while page < page_count:
-            all_vacancies[language].append(get_vacancies(
-                area, professional_role, language, page))
-            time.sleep(2)
-            page += 1
+        while True:
+            language_vacancies = get_vacancies(
+                area, professional_role, language, page)
+            all_vacancies[language].append(language_vacancies)
+            if page >= language_vacancies['pages'] - 1:
+                break
+            page+=1
+            time.sleep(4)
     return all_vacancies
 
 
