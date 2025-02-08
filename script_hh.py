@@ -1,7 +1,6 @@
 import requests
 import time
 from salary_counter import get_average_salary
-from requests.adapters import HTTPAdapter, Retry
 
 
 def get_vacancies(area, professional_role, language, page=0):
@@ -11,9 +10,10 @@ def get_vacancies(area, professional_role, language, page=0):
               'currency': 'RUR', 'page': page, 'per_page': 100}
     json_response = requests.get('https://api.hh.ru/vacancies', params=params)
     response = json_response.json()
-    return {'items': response['items'],
-            'pages': response['pages'],
-            'found': response['found']}
+    vacancies = {'items': response['items'],
+                 'pages': response['pages'],
+                 'found': response['found']}
+    return vacancies
 
 
 def get_all_vacancies(languages, area, professional_role):
@@ -22,18 +22,12 @@ def get_all_vacancies(languages, area, professional_role):
         page = 0
         all_vacancies[language] = []
         while True:
-            # print(page)
             language_vacancies = get_vacancies(
                 area, professional_role, language, page)
-            try:
-                k = language_vacancies['pages']
-            except:
-                print(language_vacancies)
             all_vacancies[language].append(language_vacancies)
             if page >= language_vacancies['pages'] - 1:
                 break
             page += 1
-            print(f'{page}/{language_vacancies["pages"]}')
             time.sleep(2)
     return all_vacancies
 
