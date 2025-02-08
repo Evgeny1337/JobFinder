@@ -14,15 +14,16 @@ def get_vacancies(language, token):
     response = requests.get(
         'https://api.superjob.ru/2.0/vacancies/',
         headers=headers,
-        params=params)
-    return response
+        params=params).json()
+    vacancies = {'objects': response['objects'], 'total': response['total']}
+    return vacancies
 
 
 def get_all_vacancies(languages, token):
     all_vacancies = {}
     for language in languages:
-        response = get_vacancies(language, token)
-        all_vacancies[language] = response.json()
+        vacancies = get_vacancies(language, token)
+        all_vacancies[language] = vacancies
     return all_vacancies
 
 
@@ -44,7 +45,7 @@ def get_jf_statistic_salary(token):
     for language, language_vacancies in all_vacancies.items():
         vacancies = language_vacancies['objects']
         salaries = get_avarage_salary(vacancies)
-        if sum(salaries) > 0:
+        if salaries:
             avarage_salary = int(sum(salaries)/len(salaries))
         else:
             avarage_salary = 0
