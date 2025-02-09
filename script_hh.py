@@ -36,14 +36,14 @@ def get_all_vacancies(languages):
 
 
 def predict_rub_salaries(vacancies):
-    predict_salaries_result = []
+    predict_salaries = []
     language_vacancies = vacancies['items']
     for vacancy in language_vacancies:
         salary = vacancy['salary']
         if salary:
             salary = get_average_salary(salary['from'], salary['to'])
-        predict_salaries_result.append(salary)
-    return predict_salaries_result
+        predict_salaries.append(salary)
+    return predict_salaries
 
 
 def calculation_hh_statistic_salary(all_vacancies):
