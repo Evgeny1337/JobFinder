@@ -2,12 +2,16 @@ import requests
 import time
 from salary_counter import get_average_salary
 
+HH_AREA = 113
+HH_PROFESSIONAL_ROLE = 96
+HH_PURE_PAGE = 100
 
-def get_vacancies(area, professional_role, language, page=0):
+
+def get_vacancies(language, page=0):
     params = {'text': 'Программист {}'.format(language),
-              'area': area,
-              'professional_role': professional_role,
-              'currency': 'RUR', 'page': page, 'per_page': 100}
+              'area': HH_AREA,
+              'professional_role': HH_PROFESSIONAL_ROLE,
+              'currency': 'RUR', 'page': page, 'per_page': HH_PURE_PAGE}
     json_response = requests.get('https://api.hh.ru/vacancies', params=params)
     response = json_response.json()
     vacancies = {'items': response['items'],
@@ -16,14 +20,13 @@ def get_vacancies(area, professional_role, language, page=0):
     return vacancies
 
 
-def get_all_vacancies(languages, area, professional_role):
+def get_all_vacancies(languages):
     all_vacancies = {}
     for language in languages:
         page = 0
         all_vacancies[language] = []
         while True:
-            language_vacancies = get_vacancies(
-                area, professional_role, language, page)
+            language_vacancies = get_vacancies(language, page)
             all_vacancies[language].append(language_vacancies)
             if page >= language_vacancies['pages'] - 1:
                 break
@@ -43,15 +46,8 @@ def predict_rub_salaries(vacancies):
     return predict_salaries_result
 
 
-def get_hh_statistic_salary(area=113, professional_role=96):
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    avarage_salary_result = {}
-    all_vacancies = get_all_vacancies(
-        languages,
-        area,
-        professional_role
-    )
+def calculation_hh_statistic_salary(all_vacancies):
+    avarage_salary = {}
     for language, language_vacancies in all_vacancies.items():
         count = language_vacancies[0]['found']
         nonempty_salaries = []
@@ -64,10 +60,18 @@ def get_hh_statistic_salary(area=113, professional_role=96):
             sum(nonempty_salaries) /
             len(nonempty_salaries)
         )
-        avarage_salary_result[language] = {"vacancies_found": count,
-                                           "vacancies_processed": nonempty_count,
-                                           "average_salary": average_salary}
-    return avarage_salary_result
+        avarage_salary[language] = {"vacancies_found": count,
+                                    "vacancies_processed": nonempty_count,
+                                    "average_salary": average_salary}
+    return avarage_salary
+
+
+def get_hh_statistic_salary():
+    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
+                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
+    all_vacancies = get_all_vacancies(languages)
+    avarage_salary = calculation_hh_statistic_salary(all_vacancies)
+    return avarage_salary
 
 
 def main():

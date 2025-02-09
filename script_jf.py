@@ -5,12 +5,13 @@ from salary_counter import get_average_salary
 
 SUPERJOB_TOWN = 4
 SUPERJOB_CATALOGUES = 48
+SUPERJOB_COUNT = 100
 
 
 def get_vacancies(language, token):
     headers = {'X-Api-App-Id': token}
     params = {'town': SUPERJOB_TOWN, 'catalogues': SUPERJOB_CATALOGUES,
-              'keyword': '{}'.format(language), 'count': 100}
+              'keyword': '{}'.format(language), 'count': SUPERJOB_COUNT}
     response = requests.get(
         'https://api.superjob.ru/2.0/vacancies/',
         headers=headers,
@@ -37,11 +38,8 @@ def get_avarage_salary(vacancies):
     return nonempty_salary
 
 
-def get_jf_statistic_salary(token):
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
+def calculation_jf_statistic_salary(all_vacancies):
     avarage_stattistic = {}
-    all_vacancies = get_all_vacancies(languages, token)
     for language, language_vacancies in all_vacancies.items():
         vacancies = language_vacancies['objects']
         salaries = get_avarage_salary(vacancies)
@@ -55,6 +53,14 @@ def get_jf_statistic_salary(token):
             "vacancies_found": amount,
             "vacancies_processed": count,
             "average_salary": avarage_salary}
+    return avarage_stattistic
+
+
+def get_jf_statistic_salary(token):
+    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
+                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
+    all_vacancies = get_all_vacancies(languages, token)
+    avarage_stattistic = calculation_jf_statistic_salary(all_vacancies)
     return avarage_stattistic
 
 
