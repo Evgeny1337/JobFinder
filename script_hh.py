@@ -22,43 +22,43 @@ def get_vacancies(language, page=0):
 
 def get_all_vacancies(languages):
     all_vacancies = {}
+    vacancies = []
     for language in languages:
         page = 0
-        all_vacancies[language] = []
         while True:
             language_vacancies = get_vacancies(language, page)
-            all_vacancies[language].append(language_vacancies)
-            if page >= language_vacancies['pages'] - 1:
+            for vacancy in language_vacancies['items']:
+                vacancies.append(vacancy)
+            if page >= language_vacancies['pages'] - 1 or page > 5:
+                all_vacancies[language] = (vacancies,language_vacancies['found'])
                 break
             page += 1
             time.sleep(2)
     return all_vacancies
 
 
-def predict_rub_salaries(vacancies):
-    predict_salaries = []
-    language_vacancies = vacancies['items']
-    for vacancy in language_vacancies:
-        salary = vacancy['salary']
-        if salary:
-            salary = get_average_salary(salary['from'], salary['to'])
-        predict_salaries.append(salary)
-    return predict_salaries
+def predict_rub_salaries(vacancy):
+    salary = vacancy['salary']
+    if salary:
+        salary = get_average_salary(salary['from'], salary['to'])
+        return salary
+    return None
 
 
 def calculation_hh_statistic_salary(all_vacancies):
     avarage_salary = {}
     for language, language_vacancies in all_vacancies.items():
-        count = language_vacancies[0]['found']
-        nonempty_salaries = []
-        for vacancies in language_vacancies:
-            salaries = [salary for salary in predict_rub_salaries(
-                vacancies) if salary]
-            nonempty_salaries += salaries
-        nonempty_count = len(nonempty_salaries)
+        count = language_vacancies[1]
+        salaries = 0
+        nonempty_count = 0
+        for vacancy in language_vacancies[0]:
+            predict_salary = predict_rub_salaries(vacancy)
+            if predict_salary:
+                salaries += predict_salary
+                nonempty_count += 1 
         average_salary = 0 if nonempty_count <= 0 else int(
-            sum(nonempty_salaries) /
-            len(nonempty_salaries)
+            salaries/
+            len(language_vacancies[0])
         )
         avarage_salary[language] = {"vacancies_found": count,
                                     "vacancies_processed": nonempty_count,
