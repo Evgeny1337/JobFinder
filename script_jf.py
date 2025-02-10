@@ -8,9 +8,10 @@ SUPERJOB_CATALOGUES = 48
 SUPERJOB_COUNT = 100
 
 
-def get_vacancies(language, token):
+def get_vacancies(language, token, page=0):
     headers = {'X-Api-App-Id': token}
     params = {'town': SUPERJOB_TOWN, 'catalogues': SUPERJOB_CATALOGUES,
+              'page': page,
               'keyword': '{}'.format(language), 'count': SUPERJOB_COUNT}
     response = requests.get(
         'https://api.superjob.ru/2.0/vacancies/',
@@ -22,9 +23,17 @@ def get_vacancies(language, token):
 
 def get_all_vacancies(languages, token):
     all_vacancies = {}
+    list_vacancies = []
+    page_number = 0
     for language in languages:
-        vacancies = get_vacancies(language, token)
-        all_vacancies[language] = vacancies
+        while True:
+            vacancies = get_vacancies(language, token, page_number)
+            if not vacancies['objects']:
+                break
+            for vacancy in vacancies['objects']:
+                list_vacancies.append(vacancy)
+            page_number += 1
+        all_vacancies[language] = (list_vacancies, vacancies['total'])
     return all_vacancies
 
 
@@ -37,21 +46,21 @@ def get_avarage_salary(vacancies):
             vacancie['payment_to'])
         if avarage_salary:
             nonempty_salary += avarage_salary
-            salary_count += 1 
+            salary_count += 1
     return (nonempty_salary, salary_count)
 
 
 def calculation_jf_statistic_salary(all_vacancies):
     avarage_stattistic = {}
     for language, language_vacancies in all_vacancies.items():
-        vacancies = language_vacancies['objects']
+        vacancies = language_vacancies[0]
         salaries = get_avarage_salary(vacancies)
         if salaries[1]:
             avarage_salary = int(salaries[0]/salaries[1])
         else:
             avarage_salary = 0
         count = salaries[1]
-        amount = language_vacancies['total']
+        amount = language_vacancies[1]
         avarage_stattistic[language] = {"vacancies_found": amount,
                                         "vacancies_processed": count,
                                         "average_salary": avarage_salary}
@@ -64,5 +73,3 @@ def get_jf_statistic_salary(token):
     all_vacancies = get_all_vacancies(languages, token)
     avarage_stattistic = calculation_jf_statistic_salary(all_vacancies)
     return avarage_stattistic
-
-
