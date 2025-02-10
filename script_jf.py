@@ -38,7 +38,7 @@ def get_avarage_salary(vacancies):
         if avarage_salary:
             nonempty_salary += avarage_salary
             salary_count += 1 
-    return (nonempty_salary,salary_count)
+    return (nonempty_salary, salary_count)
 
 
 def calculation_jf_statistic_salary(all_vacancies):
@@ -52,10 +52,9 @@ def calculation_jf_statistic_salary(all_vacancies):
             avarage_salary = 0
         count = salaries[1]
         amount = language_vacancies['total']
-        avarage_stattistic[language] = {
-            "vacancies_found": amount,
-            "vacancies_processed": count,
-            "average_salary": avarage_salary}
+        avarage_stattistic[language] = {"vacancies_found": amount,
+                                        "vacancies_processed": count,
+                                        "average_salary": avarage_salary}
     return avarage_stattistic
 
 
@@ -67,11 +66,3 @@ def get_jf_statistic_salary(token):
     return avarage_stattistic
 
 
-def main():
-    load_dotenv()
-    token = environ['SUPERJOB_TOKEN']
-    print(get_jf_statistic_salary(token))
-
-
-if __name__ == '__main__':
-    main()

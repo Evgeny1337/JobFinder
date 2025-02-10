@@ -30,7 +30,7 @@ def get_all_vacancies(languages):
             for vacancy in language_vacancies['items']:
                 vacancies.append(vacancy)
             if page >= language_vacancies['pages'] - 1 or page > 5:
-                all_vacancies[language] = (vacancies,language_vacancies['found'])
+                all_vacancies[language] = (vacancies, language_vacancies['found'])
                 break
             page += 1
             time.sleep(2)
@@ -56,10 +56,7 @@ def calculation_hh_statistic_salary(all_vacancies):
             if predict_salary:
                 salaries += predict_salary
                 nonempty_count += 1 
-        average_salary = 0 if nonempty_count <= 0 else int(
-            salaries/
-            len(language_vacancies[0])
-        )
+        average_salary = 0 if nonempty_count <= 0 else int(salaries / len(language_vacancies[0]))
         avarage_salary[language] = {"vacancies_found": count,
                                     "vacancies_processed": nonempty_count,
                                     "average_salary": average_salary}
@@ -72,12 +69,3 @@ def get_hh_statistic_salary():
     all_vacancies = get_all_vacancies(languages)
     avarage_salary = calculation_hh_statistic_salary(all_vacancies)
     return avarage_salary
-
-
-def main():
-    avarage_salarys = get_hh_statistic_salary()
-    print(avarage_salarys)
-
-
-if __name__ == '__main__':
-    main()
