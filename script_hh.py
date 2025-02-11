@@ -12,8 +12,7 @@ def get_vacancies(language, page=0):
               'area': HH_AREA,
               'professional_role': HH_PROFESSIONAL_ROLE,
               'currency': 'RUR', 'page': page, 'per_page': HH_PURE_PAGE}
-    json_response = requests.get('https://api.hh.ru/vacancies', params=params)
-    response = json_response.json()
+    response = requests.get('https://api.hh.ru/vacancies', params=params).json()
     vacancies = {'items': response['items'],
                  'pages': response['pages'],
                  'found': response['found']}
