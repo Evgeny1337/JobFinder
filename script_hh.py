@@ -12,7 +12,9 @@ def get_vacancies(language, page=0):
               'area': HH_AREA,
               'professional_role': HH_PROFESSIONAL_ROLE,
               'currency': 'RUR', 'page': page, 'per_page': HH_PURE_PAGE}
-    response = requests.get('https://api.hh.ru/vacancies', params=params).json()
+    api_response = requests.get('https://api.hh.ru/vacancies', params=params)
+    api_response.raise_for_status()
+    response = api_response.json()
     vacancies = {'items': response['items'],
                  'pages': response['pages'],
                  'found': response['found']}
@@ -26,8 +28,7 @@ def get_all_vacancies(languages):
         page = 0
         while True:
             language_vacancies = get_vacancies(language, page)
-            for vacancy in language_vacancies['items']:
-                vacancies.append(vacancy)
+            vacancies.extend(language_vacancies['items'])
             if page >= language_vacancies['pages'] - 1:
                 all_vacancies[language] = (vacancies, language_vacancies['found'])
                 break

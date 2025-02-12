@@ -11,27 +11,28 @@ def get_vacancies(language, token, page=0):
     params = {'town': SUPERJOB_TOWN, 'catalogues': SUPERJOB_CATALOGUES,
               'page': page,
               'keyword': '{}'.format(language), 'count': SUPERJOB_COUNT}
-    response = requests.get(
+    api_response = requests.get(
         'https://api.superjob.ru/2.0/vacancies/',
         headers=headers,
-        params=params).json()
+        params=params)
+    api_response.raise_for_status()
+    response = api_response.json()
     vacancies = {'objects': response['objects'], 'total': response['total']}
     return vacancies
 
 
 def get_all_vacancies(languages, token):
     all_vacancies = {}
-    vacancies_objects = []
     page_number = 0
     for language in languages:
+        vacancies_list = []
         while True:
             vacancies = get_vacancies(language, token, page_number)
             if not vacancies['objects']:
                 break
-            for vacancy in vacancies['objects']:
-                vacancies_objects.append(vacancy)
+            vacancies_list.extend(vacancies['objects'])
             page_number += 1
-        all_vacancies[language] = (vacancies_objects, vacancies['total'])
+        all_vacancies[language] = (vacancies_list, vacancies['total'])
     return all_vacancies
 
 
@@ -53,14 +54,12 @@ def get_jf_statistic_salary(token):
                  'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
     all_vacancies = get_all_vacancies(languages, token)
     avarage_stattistic = {}
-    for language, language_vacancies in all_vacancies.items():
-        vacancies = language_vacancies[0]
+    for language, (vacancies, total) in all_vacancies.items():
         salaries = get_avarage_salary(vacancies)
         average_salary = int(salaries[0] / salaries[1]) if salaries[1] else 0
         count = salaries[1]
-        amount = language_vacancies[1]
         avarage_stattistic[language] = {
-            "vacancies_found": amount,
+            "vacancies_found": total,
             "vacancies_processed": count,
             "average_salary": average_salary,
         }
