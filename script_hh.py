@@ -28,7 +28,7 @@ def get_all_vacancies(languages):
             language_vacancies = get_vacancies(language, page)
             for vacancy in language_vacancies['items']:
                 vacancies.append(vacancy)
-            if page >= language_vacancies['pages'] - 1 or page > 5:
+            if page >= language_vacancies['pages'] - 1:
                 all_vacancies[language] = (vacancies, language_vacancies['found'])
                 break
             page += 1
@@ -44,27 +44,24 @@ def predict_rub_salaries(vacancy):
     return None
 
 
-def calculation_hh_statistic_salary(all_vacancies):
+def get_hh_statistic_salary():
+    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
+                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
+    all_vacancies = get_all_vacancies(languages)
     avarage_salary = {}
-    for language, language_vacancies in all_vacancies.items():
-        count = language_vacancies[1]
-        salaries = 0
+    for language, (vacancies, count) in all_vacancies.items():
+        salaries_sum = 0
         nonempty_count = 0
-        for vacancy in language_vacancies[0]:
-            predict_salary = predict_rub_salaries(vacancy)
-            if predict_salary:
-                salaries += predict_salary
+        for vacancy in vacancies:
+            salary = predict_rub_salaries(vacancy)
+            if salary:
+                salaries_sum += salary
                 nonempty_count += 1 
-        average_salary = 0 if nonempty_count <= 0 else int(salaries / len(language_vacancies[0]))
+        average_salary = int(salaries_sum / max(1, len(vacancies)))
         avarage_salary[language] = {"vacancies_found": count,
                                     "vacancies_processed": nonempty_count,
                                     "average_salary": average_salary}
     return avarage_salary
 
 
-def get_hh_statistic_salary():
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    all_vacancies = get_all_vacancies(languages)
-    avarage_salary = calculation_hh_statistic_salary(all_vacancies)
-    return avarage_salary
+
