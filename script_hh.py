@@ -23,9 +23,9 @@ def get_vacancies(language, page=0):
 
 def get_all_vacancies(languages):
     all_vacancies = {}
-    vacancies = []
     for language in languages:
         page = 0
+        vacancies = []
         while True:
             language_vacancies = get_vacancies(language, page)
             vacancies.extend(language_vacancies['items'])

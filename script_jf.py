@@ -37,16 +37,14 @@ def get_all_vacancies(languages, token):
 
 
 def get_avarage_salary(vacancies):
-    nonempty_salary = 0
-    salary_count = 0
+    nonempty_salary = []
     for vacancie in vacancies:
         avarage_salary = get_average_salary(
             vacancie['payment_from'],
             vacancie['payment_to'])
         if avarage_salary:
-            nonempty_salary += avarage_salary
-            salary_count += 1
-    return (nonempty_salary, salary_count)
+            nonempty_salary.append(avarage_salary)
+    return nonempty_salary
 
 
 def get_jf_statistic_salary(token):
@@ -56,8 +54,8 @@ def get_jf_statistic_salary(token):
     avarage_stattistic = {}
     for language, (vacancies, total) in all_vacancies.items():
         salaries = get_avarage_salary(vacancies)
-        average_salary = int(salaries[0] / salaries[1]) if salaries[1] else 0
-        count = salaries[1]
+        average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
+        count = len(salaries)
         avarage_stattistic[language] = {
             "vacancies_found": total,
             "vacancies_processed": count,
