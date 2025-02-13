@@ -54,11 +54,11 @@ def get_jf_statistic_salary(token):
     avarage_stattistic = {}
     for language, (vacancies, total) in all_vacancies.items():
         salaries = get_avarage_salary(vacancies)
-        average_salary = int(sum(salaries) / len(salaries)) if len(salaries) else 0
         count = len(salaries)
+        average_salary = int(sum(salaries) / count) if count else 0
         avarage_stattistic[language] = {
-            "vacancies_found": total,
-            "vacancies_processed": count,
-            "average_salary": average_salary,
+            "found": total,
+            "processed": count,
+            "salary": average_salary,
         }
     return avarage_stattistic

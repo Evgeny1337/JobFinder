@@ -4,25 +4,22 @@ from script_jf import get_jf_statistic_salary
 from terminaltables import AsciiTable
 from os import environ
 
+def create_table(salaries_statistic, title):
+    header = [[' Язык программирования ', 'Вакансий найдено',
+              'Вакансий обработано', 'Средняя зарплата']]
+    table_data = header + [[language] + list(statistic.values())
+                            for language, statistic in salaries_statistic]
+    table = AsciiTable(table_data,title)
+    table.justify_columns[2] = 'right'
+    return table
 
 def main():
     load_dotenv()
     token = environ['SUPERJOB_TOKEN']
-    header = [[' Язык программирования ', 'Вакансий найдено',
-              'Вакансий обработано', 'Средняя зарплата']]
-    hh_avarage_salary = get_hh_statistic_salary().items()
-    superjob_avarage_salary = get_jf_statistic_salary(token).items()
-    hh_salaries = header + [[key] + list(value.values())
-                            for key, value in hh_avarage_salary]
-    jf_salaries = header + [[key] + list(value.values())
-                            for key, value in superjob_avarage_salary]
-
-    table_hh = AsciiTable(hh_salaries, 'HeadHunter Moscow')
-    table_hh.justify_columns[2] = 'right'
-
-    table_jf = AsciiTable(jf_salaries, 'SuperJob Moscow')
-    table_jf.justify_columns[2] = 'right'
-
+    hh_salaries_statistic = get_hh_statistic_salary().items()
+    superjob_salaries_statistic = get_jf_statistic_salary(token).items()
+    table_hh = create_table(hh_salaries_statistic, 'HeadHunter Moscow')
+    table_jf = create_table(superjob_salaries_statistic, 'SuperJob Moscow')
     print(table_hh.table)
     print(table_jf.table)
 

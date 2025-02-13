@@ -59,9 +59,9 @@ def get_hh_statistic_salary():
                 salaries_sum += salary
                 nonempty_count += 1 
         average_salary = int(salaries_sum / max(1, len(vacancies)))
-        avarage_salary[language] = {"vacancies_found": count,
-                                    "vacancies_processed": nonempty_count,
-                                    "average_salary": average_salary}
+        avarage_salary[language] = {"found": count,
+                                    "processed": nonempty_count,
+                                    "salary": average_salary}
     return avarage_salary
 
 
