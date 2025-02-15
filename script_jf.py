@@ -21,36 +21,33 @@ def get_vacancies(language, token, page=0):
     return vacancies
 
 
-def get_all_vacancies(languages, token):
+def get_all_jf_vacancies(languages, token):
     all_vacancies = {}
     page_number = 0
     for language in languages:
-        vacancies_list = []
+        vacancies_language = []
         while True:
             vacancies = get_vacancies(language, token, page_number)
             if not vacancies['objects']:
                 break
-            vacancies_list.extend(vacancies['objects'])
+            vacancies_language.extend(vacancies['objects'])
             page_number += 1
-        all_vacancies[language] = (vacancies_list, vacancies['total'])
+        all_vacancies[language] = (vacancies_language, vacancies['total'])
     return all_vacancies
 
 
 def get_avarage_salary(vacancies):
-    nonempty_salary = []
+    nonempty_salaries = []
     for vacancie in vacancies:
         avarage_salary = get_average_salary(
             vacancie['payment_from'],
             vacancie['payment_to'])
         if avarage_salary:
-            nonempty_salary.append(avarage_salary)
-    return nonempty_salary
+            nonempty_salaries.append(avarage_salary)
+    return nonempty_salaries
 
 
-def get_jf_statistic_salary(token):
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    all_vacancies = get_all_vacancies(languages, token)
+def get_jf_statistic_salary(all_vacancies):
     avarage_stattistic = {}
     for language, (vacancies, total) in all_vacancies.items():
         salaries = get_avarage_salary(vacancies)

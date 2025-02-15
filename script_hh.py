@@ -21,7 +21,7 @@ def get_vacancies(language, page=0):
     return vacancies
 
 
-def get_all_vacancies(languages):
+def get_all_hh_vacancies(languages):
     all_vacancies = {}
     for language in languages:
         page = 0
@@ -30,7 +30,8 @@ def get_all_vacancies(languages):
             language_vacancies = get_vacancies(language, page)
             vacancies.extend(language_vacancies['items'])
             if page >= language_vacancies['pages'] - 1:
-                all_vacancies[language] = (vacancies, language_vacancies['found'])
+                all_vacancies[language] = (
+                    vacancies, language_vacancies['found'])
                 break
             page += 1
             time.sleep(2)
@@ -45,10 +46,7 @@ def predict_rub_salaries(vacancy):
     return None
 
 
-def get_hh_statistic_salary():
-    languages = ['JavaScript', 'Java', 'Python', 'Ruby',
-                 'PHP', 'C++', 'C#', 'C', 'Go', 'Objective-C']
-    all_vacancies = get_all_vacancies(languages)
+def get_hh_statistic_salary(all_vacancies):
     avarage_salary = {}
     for language, (vacancies, count) in all_vacancies.items():
         salaries_sum = 0
@@ -57,12 +55,9 @@ def get_hh_statistic_salary():
             salary = predict_rub_salaries(vacancy)
             if salary:
                 salaries_sum += salary
-                nonempty_count += 1 
-        average_salary = int(salaries_sum / max(1, len(vacancies)))
+                nonempty_count += 1
+        average_salary = int(salaries_sum / max(1, nonempty_count))
         avarage_salary[language] = {"found": count,
                                     "processed": nonempty_count,
                                     "salary": average_salary}
     return avarage_salary
-
-
-
